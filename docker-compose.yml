@@ -41,6 +41,7 @@ services:
       - redis
     volumes:
       - n8n_data:/home/node/.n8n
+      - ./workflows:/workflows
 
   worker:
     image: docker.n8n.io/n8nio/n8n:2.25.6
