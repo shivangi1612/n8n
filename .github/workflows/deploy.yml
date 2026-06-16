@@ -18,6 +18,7 @@ jobs:
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           command_timeout: 15m
+          debug: true
 
           script: |
             set -e
