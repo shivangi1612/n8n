@@ -1,0 +1,159 @@
+{
+  "name": "Website Health Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "*/5 * * * *"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -368,
+        -16
+      ],
+      "id": "912dd660-47f5-4b4d-b200-f9fec5627ecc",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://shivangidev.netlify.app/",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          },
+          "timeout": 50000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -160,
+        -16
+      ],
+      "id": "1d68737a-aca9-4835-9b8c-56d2c93f02f6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ffcced1c-070f-4c1e-9751-af4f233bbffd",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        48,
+        -16
+      ],
+      "id": "d70cea13-e878-4efc-8f72-9f2198314f5d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "select": "user",
+        "user": {
+          "__rl": true,
+          "value": "U0ACVKWN5M0",
+          "mode": "list",
+          "cachedResultName": "shivangi.singh"
+        },
+        "text": "=🚨 WEBSITE DOWN ALERT  Website: https://your-website.com  Status Code: {{$json.statusCode}}  Checked At: {{$now}}  Please investigate immediately.",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        256,
+        -32
+      ],
+      "id": "dd30549f-4d27-486e-96f4-26c48608d2b0",
+      "name": "Send a message",
+      "webhookId": "94fedd1c-a2fa-451b-b623-1f233c24145a",
+      "credentials": {
+        "slackApi": {
+          "id": "iNrRT0GMpgoftW9M",
+          "name": "Slack Bullit"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "743a6a94-abbf-48bf-99e6-df505ad45fdb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7c76726afbd9e18a4b3f34f9ca69e38d66e8926a90312127edb24dc7376a2cb9"
+  },
+  "id": "FVlLO1yQK5fZ1klM",
+  "tags": []
+}
