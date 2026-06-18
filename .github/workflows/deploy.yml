@@ -10,31 +10,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to GCP VM
+      - name: Deploy to VM
         uses: appleboy/ssh-action@v1.2.0
 
         with:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          command_timeout: 15m
+          command_timeout: 20m
           debug: true
 
           script: |
             set -e
 
+            echo "📦 Moving to project directory..."
             cd ~/n8n-deployment
 
-            echo "Pulling latest code...."
+            echo "⬇️ Pulling latest code..."
             git pull origin main
 
-            echo "Checking n8n container..."
-            docker ps | grep n8n-deployment-n8n-1
+            echo "🐳 Rebuilding containers (if needed)..."
+            docker compose up -d --build
 
-            echo "Importing workflows..."
-            docker exec n8n-deployment-n8n-1 \
-              n8n import:workflow \
-              --separate \
-              --input=/workflows
+            echo "🔄 Restarting worker..."
+            docker compose restart worker
 
-            echo "Deployment completed"
+            echo "🧹 Cleaning unused containers..."
+            docker system prune -f
+
+            echo "✅ Deployment successful"
