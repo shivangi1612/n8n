@@ -23,27 +23,27 @@ jobs:
           command_timeout: 20m
           debug: true
 
-          script: |
-            set -e
+          script:|
+  set -e
 
-            echo "Testing SSH session..."
-            whoami
-            uname -a
+  cd ~/n8n-deployment
 
-            echo "Moving to project directory..."
-            cd ~/n8n-deployment
+  echo "Saving current commit..."
+  git rev-parse HEAD > .last_good_commit
 
-            echo "Pulling latest code..."
-            git pull origin main
+  echo "Pulling latest code..."
+  git pull origin main
 
-            echo "Restarting n8n stack..."
-            docker compose down
-            docker compose up -d
+  echo "Starting containers..."
+  docker compose up -d
 
-            echo "Restarting worker..."
-            docker compose restart worker
+  echo "Importing workflows..."
+  docker exec n8n-deployment-n8n-1 \
+    n8n import:workflow \
+    --separate \
+    --input=/workflows
 
-            echo "Cleaning up..."
-            docker system prune -f
+  echo "Running health check..."
+  curl -f http://localhost:5678/healthz
 
-            echo "Deployment completed successfully"
+  echo "Deployment completed"
