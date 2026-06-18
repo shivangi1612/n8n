@@ -64,7 +64,7 @@
       "retryOnFail": true,
       "credentials": {
         "googleApi": {
-          "id": "xsZHT3BKsMKLVxDT",
+          "id": "FydkwzXKfk6yvnfT",
           "name": "Firestore"
         }
       }
@@ -155,10 +155,11 @@
       "retryOnFail": true,
       "credentials": {
         "googleApi": {
-          "id": "xsZHT3BKsMKLVxDT",
+          "id": "FydkwzXKfk6yvnfT",
           "name": "Firestore"
         }
-      }
+      },
+      "disabled": true
     },
     {
       "parameters": {
@@ -229,7 +230,7 @@
       "retryOnFail": true,
       "credentials": {
         "googleApi": {
-          "id": "xsZHT3BKsMKLVxDT",
+          "id": "FydkwzXKfk6yvnfT",
           "name": "Firestore"
         }
       }
@@ -1375,13 +1376,15 @@
   },
   "active": false,
   "settings": {
-    "executionOrder": "v1"
+    "executionOrder": "v1",
+    "binaryMode": "separate"
   },
-  "versionId": "6e494eb5-a64d-4ece-9a94-f9b56de00e6e",
+  "versionId": "7dd8090b-5270-4d18-b5f0-b4c2dc60b79e",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "7c76726afbd9e18a4b3f34f9ca69e38d66e8926a90312127edb24dc7376a2cb9"
+    "instanceId": "9e971adb7201903a93d8de825cd415b6c18ea338b6a93ac98e94a49da5474aab"
   },
+  "nodeGroups": [],
   "id": "zZedZGbB3FjuNPLU",
   "tags": []
 }
