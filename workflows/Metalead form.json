@@ -1,0 +1,1387 @@
+{
+  "name": "Meta Lead Form",
+  "nodes": [
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AAEBCRML5",
+          "mode": "list",
+          "cachedResultName": "credicard-first-form"
+        },
+        "text": "={{ $json.toJsonString() }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -784,
+        672
+      ],
+      "id": "8a115968-4ffd-42c0-b6fa-af129733e073",
+      "name": "Send a message",
+      "webhookId": "be78cf7b-ec93-485a-af61-860b8d7ec356",
+      "credentials": {
+        "slackApi": {
+          "id": "iNrRT0GMpgoftW9M",
+          "name": "Slack Bullit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const rawPhone = item.json.data?.phone_number || \"\";\n\n  const clean10 = rawPhone\n    .replace(/\\D/g, \"\")\n    .slice(-10);\n\n  const formatted = clean10\n    ? `+91 ${clean10.slice(0, 5)} ${clean10.slice(5)}`\n    : \"\";\n\n  return {\n    json: {\n      ...item.json,\n      data: {\n        ...item.json.data,\n        mobile: clean10,\n        formatted_mobile: formatted\n      }\n    }\n  };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -592,
+        928
+      ],
+      "id": "67be4064-9cff-4e65-9abc-d1fd3acd05cf",
+      "name": "Code in JavaScript16"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "query",
+        "projectId": "={{ $env.FIRESTORE_PROJECT_ID }}",
+        "database": "={{ $env.FIRESTORE_DATABASE_ID }}",
+        "query": "={\n  \"structuredQuery\": {\n    \"from\": [\n      {\n        \"collectionId\": \"crm_customers\"\n      }\n    ],\n    \"where\": {\n      \"fieldFilter\": {\n        \"field\": {\n          \"fieldPath\": \"profile.mobile\"\n        },\n        \"op\": \"EQUAL\",\n        \"value\": {\n          \"integerValue\": \"{{ Number($json.data.mobile) }}\"\n        }\n      }\n    },\n    \"limit\": 1\n  }\n}\n"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        928
+      ],
+      "id": "fd4f1817-240f-4e6e-841a-cd06f3204868",
+      "name": "check if customer exists2",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleApi": {
+          "id": "xsZHT3BKsMKLVxDT",
+          "name": "Firestore"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3afd7431-67bb-4534-a888-02cdc8e6ffcc",
+              "leftValue": "={{ $json }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        96,
+        928
+      ],
+      "id": "3f3234d7-849d-45e8-b8ad-f2729d3219fd",
+      "name": "If20"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A9P3N2QP8",
+          "mode": "list",
+          "cachedResultName": "firebase-logs"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Customer Added:* {{ $json.profile.mobile }}\"\n      }\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"`Env: {{ $('Code in JavaScript16').item.json.env }}`\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "text": "=",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1520,
+        608
+      ],
+      "id": "ea8f5e94-2421-40e4-beb2-b2bbabd30965",
+      "name": "Send a message16",
+      "webhookId": "f6ce88a1-bf0b-4436-94fc-eba7503fd2a8",
+      "credentials": {
+        "slackApi": {
+          "id": "iNrRT0GMpgoftW9M",
+          "name": "Slack Bullit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "create",
+        "projectId": "={{ $env.FIRESTORE_PROJECT_ID }}",
+        "database": "={{ $env.FIRESTORE_DATABASE_ID}}",
+        "collection": "crm_customers",
+        "columns": "=profile, raw_events, metadata"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        1088,
+        816
+      ],
+      "id": "907f6c5b-608f-43a9-8eea-6f2ed18df93d",
+      "name": "Create a document2",
+      "retryOnFail": true,
+      "credentials": {
+        "googleApi": {
+          "id": "xsZHT3BKsMKLVxDT",
+          "name": "Firestore"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e322ed8a-7fd5-4876-b994-518318e737b9",
+              "leftValue": "={{ $json._id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1296,
+        816
+      ],
+      "id": "40d6ba2c-4fd1-4f2c-ad9a-e74553c7e5e2",
+      "name": "If21"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===================== HELPERS =====================\nconst normalize = v => (v ?? \"\").toString().trim();\nconst isEmpty = v => normalize(v) === \"\";\nconst now = () => new Date().toISOString();\n\n// ===================== INPUTS =====================\nconst existing = $input.first().json;\nconst incoming = $('Code in JavaScript16').first().json || {};\nconst lead = incoming.data || {};\n\n// ===================== PROFILE =====================\nconst profile = existing.profile ?? (existing.profile = {});\nprofile.company = Array.isArray(profile.company) ? profile.company : [];\n\n// ---------- Name ----------\nif (isEmpty(profile.name) && !isEmpty(lead.first_name)) {\n  profile.name = normalize(lead.first_name);\n}\n\nif (\n  !isEmpty(profile.name) &&\n  !isEmpty(lead.first_name) &&\n  normalize(profile.name) !== normalize(lead.first_name) &&\n  isEmpty(profile.alternate_name)\n) {\n  profile.alternate_name = normalize(lead.first_name);\n}\n\n// ---------- Mobile ----------\nif (isEmpty(profile.mobile) && !isEmpty(lead.mobile)) {\n  profile.mobile = normalize(lead.mobile);\n}\n\nif (isEmpty(profile.formatted_mobile) && !isEmpty(lead.formatted_mobile)) {\n  profile.formatted_mobile = normalize(lead.formatted_mobile);\n}\n\n// ---------- Email ----------\nif (isEmpty(profile.email) && !isEmpty(lead.email)) {\n  profile.email = normalize(lead.email);\n}\n\n// ===================== COMPANY =====================\nconst leadCompanyName = normalize(lead.company_name);\nconst leadDocs = {\n  gstin: normalize(lead.gst),\n  pan: normalize(lead.pan),\n  udyam: normalize(lead.udyam),\n};\n\n// Address from lead\nconst leadAddress = {\n  street: normalize(lead.street),\n  city: normalize(lead.city),\n  state: normalize(lead.state),\n  country: normalize(lead.country),\n  pincode: normalize(lead.pincode),\n};\n\nconst companies = profile.company;\n\n// ---------- Helpers ----------\nconst isCompanyEmpty = c =>\n  isEmpty(c.name) &&\n  isEmpty(c.gstin) &&\n  isEmpty(c.pan) &&\n  isEmpty(c.udyam);\n\n// ---------- Find company ----------\nlet company = null;\n\n// Case 1: single empty company\nconst emptyCompanies = companies.filter(isCompanyEmpty);\nif (companies.length === 1 && emptyCompanies.length === 1) {\n  company = emptyCompanies[0];\n}\n\n// Case 2: match by name\nif (!company && leadCompanyName) {\n  company = companies.find(c => normalize(c.name) === leadCompanyName);\n}\n\n// Case 3: match by identifier\nif (!company) {\n  company = companies.find(c =>\n    [\"gstin\", \"pan\", \"udyam\"].some(\n      k => !isEmpty(c[k]) && normalize(c[k]) === normalize(leadDocs[k])\n    )\n  );\n}\n\n// ---------- Create if missing ----------\nconst hasCompanyData =\n  leadCompanyName ||\n  leadDocs.gstin ||\n  leadDocs.pan ||\n  leadDocs.udyam;\n\nif (!company && hasCompanyData) {\n  company = {\n    name: leadCompanyName,\n    gstin: \"\",\n    pan: \"\",\n    udyam: \"\",\n    address: {\n      street: \"\",\n      city: \"\",\n      state: \"\",\n      country: \"\",\n      pincode: \"\",\n    },\n  };\n  companies.push(company);\n}\n\n// ---------- Fill identifiers ----------\nif (company) {\n  [\"gstin\", \"pan\", \"udyam\"].forEach(k => {\n    if (isEmpty(company[k]) && !isEmpty(leadDocs[k])) {\n      company[k] = leadDocs[k];\n    }\n  });\n\n  // ---------- Fill address (field-level merge) ----------\n  Object.keys(leadAddress).forEach(k => {\n    if (\n      isEmpty(company.address?.[k]) &&\n      !isEmpty(leadAddress[k])\n    ) {\n      company.address[k] = leadAddress[k];\n    }\n  });\n}\n\n// ===================== RAW EVENTS =====================\nexisting.raw_events = Array.isArray(existing.raw_events)\n  ? existing.raw_events\n  : [];\n\n// ✅ extract utm (from incoming OR fallback to existing top-level)\nconst utm =\n  incoming.utm ||\n  existing.utm || // fallback for old records\n  {};\n\n// ✅ push new event WITH utm\nexisting.raw_events.push({\n  data_source_system: \"Meta\",\n  lead_source: \"Meta - Lead Form\",\n  received_at: now(),\n  payload: incoming,\n  utm: utm,\n});\n\ndelete existing.utm;\n// ===================== METADATA =====================\nexisting.metadata = existing.metadata || {};\nexisting.metadata.updated_at = now();\nexisting.metadata.updated_by = \"system\";\n\n// ===================== OUTPUT =====================\n\nreturn [{ json: existing }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        320,
+        1136
+      ],
+      "id": "4fb61b97-375a-4fd9-b2ba-6a96fc330509",
+      "name": "Code in JavaScript18"
+    },
+    {
+      "parameters": {
+        "authentication": "serviceAccount",
+        "operation": "upsert",
+        "projectId": "={{ $env.FIRESTORE_PROJECT_ID }}",
+        "database": "={{ $env.FIRESTORE_DATABASE_ID}}",
+        "collection": "crm_customers",
+        "updateKey": "=_id",
+        "columns": "profile, raw_events, metadata"
+      },
+      "type": "n8n-nodes-base.googleFirebaseCloudFirestore",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        1136
+      ],
+      "id": "29a87e3e-ac9b-4b99-9a23-e92e8a464e9c",
+      "name": "Create or update a document2",
+      "alwaysOutputData": true,
+      "retryOnFail": true,
+      "credentials": {
+        "googleApi": {
+          "id": "xsZHT3BKsMKLVxDT",
+          "name": "Firestore"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "e322ed8a-7fd5-4876-b994-518318e737b9",
+              "leftValue": "={{ $json._id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        864,
+        1136
+      ],
+      "id": "7694a410-27f2-48f9-936a-a70a471c6e0e",
+      "name": "If22"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0A9P3N2QP8",
+          "mode": "list",
+          "cachedResultName": "firebase-logs"
+        },
+        "messageType": "block",
+        "blocksUi": "={\n  \"blocks\": [\n    {\n      \"type\": \"section\",\n      \"text\": {\n        \"type\": \"mrkdwn\",\n        \"text\": \"*Customer Updated:* {{ $json.profile.mobile }}\"\n      }\n    },\n    {\n      \"type\": \"context\",\n      \"elements\": [\n        {\n          \"type\": \"mrkdwn\",\n          \"text\": \"`Env: {{ $('Code in JavaScript16').item.json.env }}`\"\n        }\n      ]\n    }\n  ]\n}\n",
+        "text": "=",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        1168,
+        1120
+      ],
+      "id": "ace2f221-9099-432c-b577-9f24b4dee0ca",
+      "name": "Send a message17",
+      "webhookId": "f6ce88a1-bf0b-4436-94fc-eba7503fd2a8",
+      "credentials": {
+        "slackApi": {
+          "id": "iNrRT0GMpgoftW9M",
+          "name": "Slack Bullit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.runo.in/v1/crm/allocation",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Auth-Key",
+              "value": "={{ $env.RUNO_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "=json",
+        "specifyBody": "json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2144,
+        688
+      ],
+      "id": "0bb58abc-a4c0-420d-989b-8fc9fa1f91e0",
+      "name": "Runo Create Allocation10",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "content": "## Firebase",
+        "height": 1056,
+        "width": 3456,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -192,
+        368
+      ],
+      "typeVersion": 1,
+      "id": "ce2f36a0-4d22-4ee9-9c1f-412e78daf66c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "page": {
+          "__rl": true,
+          "value": "784678624729008",
+          "mode": "list",
+          "cachedResultName": "Bullit",
+          "cachedResultUrl": "https://facebook.com/784678624729008"
+        },
+        "form": {
+          "__rl": true,
+          "value": "890975046591873",
+          "mode": "list",
+          "cachedResultName": "Credit Card - First Form"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.facebookLeadAdsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1184,
+        672
+      ],
+      "id": "5a01b441-6397-48c0-9a27-ce2162e9c185",
+      "name": "Credit Card - First Form",
+      "webhookId": "96930c6f-dc2f-4d79-ab73-a51f5157fa24",
+      "credentials": {
+        "facebookLeadAdsOAuth2Api": {
+          "id": "XUzxKwvhLHdke4cj",
+          "name": "Bullit Integration"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Code in JavaScript16').item.json.form.name }}",
+                    "rightValue": "Credit Card - First Form",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1e4a603d-266b-4e3d-bbce-c6332da3e0c0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Credit Card - First Form"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "5e9ce274-428e-4088-b7fc-ab8ee777157c",
+                    "leftValue": "={{ $('Code in JavaScript16').item.json.form.name }}",
+                    "rightValue": "Bullit Connect - Second Form",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Bullit Connect - Second Form"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        1520,
+        800
+      ],
+      "id": "da268493-2c18-4cf0-a024-594d0a60a0e6",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "jsCode": "const profile = $json.profile || {};\nconst company = profile.company?.[0];\n\n// get latest raw_event\nconst rawEvents = $json.raw_events || [];\nconst latestEvent = rawEvents[rawEvents.length - 1] || {};\n\n// extract utm from event\nconst utm = latestEvent.utm || {};\n\nconst customer = {\n  name: profile.name || profile.mobile,\n  phoneNumber: profile.mobile,\n  email: profile.email || \"\",\n};\n\n// ✅ Only add company if name exists\nif (company?.name && company.name.trim() !== \"\") {\n  customer.company = {\n    name: company.name,\n    address: {\n      street: company.address?.street || \"\",\n      city: company.address?.city || \"\",\n      state: company.address?.state || \"\",\n      country: company.address?.country || \"India\",\n      pincode: company.address?.pincode || \"\",\n    },\n  };\n}\n\nreturn {\n  customer,\n\n  // notes\n  notes:\n    latestEvent?.payload?.data?.['what_type_of_business_do_you_operate?'] || \"\",\n\n  processName: $env.RUNO_RM_PROCESS_NAME,\n  assignedTo: $env.RUNO_KUMAR_ASSIGNED_TO,\n  ruleName: $env.LEAD_RULE,\n\n  userFields: [\n    { name: \"Status\", value: \"New Lead\" },\n    { name: \"Source\", value: \"Meta - Lead Form - CC\" },\n    { name: \"Type Of Loan\", value: \"Credit Card\" },\n\n    // Correct UTM mapping\n    { name: \"Utm_source\", value: utm.utm_source || \"\" },\n    { name: \"Utm_medium\", value: utm.utm_medium || \"\" },\n    { name: \"Utm_campaign\", value: utm.utm_campaign || \"\" },\n    { name: \"Utm_term\", value: utm.utm_term || \"\" },\n    { name: \"Utm_content\", value: utm.utm_content || \"\" },\n  ]\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        688
+      ],
+      "id": "54127eb4-be27-4250-b438-0ede36081d09",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const profile = $json.profile || {};\nconst company = profile.company?.[0];\n\n\n// get latest raw_event\nconst rawEvents = $json.raw_events || [];\nconst latestEvent = rawEvents[rawEvents.length - 1] || {};\n\n// extract utm from event\nconst utm = latestEvent.utm || {};\n\n// ===================== DERIVED FIELDS =====================\nconst supportNeeded =\n  $('Code in JavaScript16')\n    .first()\n    ?.json?.data?.['what_support_are_you_looking_for_right_now?'] || \"\";\n\nlet loanType = \"Business Loan\";\n\nif (supportNeeded === \"government_schemes/subsidies\") {\n  loanType = \"Government Schemes\";\n} else if (supportNeeded === \"compliance_&_filings\") {\n  loanType = \"Compliance\";\n}\n\n// ===================== CUSTOMER =====================\nconst customer = {\n  name: profile.name || profile.mobile,\n  phoneNumber: profile.mobile,\n  email: profile.email || \"\",\n};\n\n// Add company ONLY if name exists and is not empty\nif (company?.name && company.name.trim() !== \"\") {\n  customer.company = {\n    name: company.name,\n    address: {\n      street: company.address?.street || \"\",\n      city: company.address?.city || \"\",\n      state: company.address?.state || \"\",\n      country: company.address?.country || \"India\",\n      pincode: company.address?.pincode || \"\",\n    },\n  };\n}\n\nreturn {\n  customer,\n  processName: $env.RUNO_RM_PROCESS_NAME,\n  assignedTo: $env.RUNO_RM_ASSIGNED_TO,\n  ruleName: $env.LEAD_RULE,\n  userFields: [\n    {\n      name: \"Status\",\n      value: \"New Lead\",\n    },\n    {\n      name: \"Source\",\n      value: \"Meta - Lead Form\",\n    },\n    {\n      name: \"Type Of Loan\",\n      value: loanType,\n    },\n        // Correct UTM mapping\n    { name: \"Utm_source\", value: utm.utm_source || \"\" },\n    { name: \"Utm_medium\", value: utm.utm_medium || \"\" },\n    { name: \"Utm_campaign\", value: utm.utm_campaign || \"\" },\n    { name: \"Utm_term\", value: utm.utm_term || \"\" },\n    { name: \"Utm_content\", value: utm.utm_content || \"\" },\n  ],\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1808,
+        912
+      ],
+      "id": "17839b78-ad06-4138-91de-9185423a1597",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "70b46a62-91e2-4977-b0e0-23b1b3bf8b77",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "6d6ec0b8-6794-4c82-8417-7445b44c8c5d",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "Invalid parameters \"customer.email\" must be a valid email",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2432,
+        688
+      ],
+      "id": "ecd32abc-72ec-465f-98a5-582b87a5c828",
+      "name": "If",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Code in JavaScript').first().json;\n\nif (data.customer) {\n  data.customer.email = \"\";\n}\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        672
+      ],
+      "id": "fe1c268d-fb83-4209-bef4-5f2562e91d98",
+      "name": "Code in JavaScript2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.runo.in/v1/crm/allocation",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Auth-Key",
+              "value": "={{ $env.RUNO_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2976,
+        672
+      ],
+      "id": "d0a5bdd7-919f-4722-a147-fe4831d9b7e8",
+      "name": "Runo Recreate Allocation"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "70b46a62-91e2-4977-b0e0-23b1b3bf8b77",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 1,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "6d6ec0b8-6794-4c82-8417-7445b44c8c5d",
+              "leftValue": "={{ $json.message }}",
+              "rightValue": "Invalid parameters \"customer.email\" must be a valid email",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2448,
+        912
+      ],
+      "id": "c71eb352-4f42-4901-8e36-f976e00d8b98",
+      "name": "If3",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Code in JavaScript1').first().json;\n\nif (data.customer) {\n  data.customer.email = \"\";\n}\n\nreturn data;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2720,
+        896
+      ],
+      "id": "2eb8956b-5ee8-4eb3-8739-52c191e2ce96",
+      "name": "Code in JavaScript3",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.runo.in/v1/crm/allocation",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Auth-Key",
+              "value": "={{ $env.RUNO_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2976,
+        896
+      ],
+      "id": "64a35e69-d382-4e93-aaaa-4e32ee778981",
+      "name": "Runo Recreate Allocation1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.runo.in/v1/crm/allocation",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Auth-Key",
+              "value": "={{ $env.RUNO_API_KEY }}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "=json",
+        "specifyBody": "json",
+        "bodyParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2144,
+        912
+      ],
+      "id": "2adbde91-7c1d-463c-9724-68a166e906bf",
+      "name": "Runo Create Allocation",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_WHATSAPP_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"integrated_number\": \"919967272273\",\n    \"content_type\": \"template\",\n    \"payload\": {\n        \"messaging_product\": \"whatsapp\",\n        \"type\": \"template\",\n        \"template\": {\n            \"name\": \"cc_metalead1\",\n            \"language\": {\n                \"code\": \"en\",\n                \"policy\": \"deterministic\"\n            },\n            \"namespace\": \"4a01b407_1984_4bfa_b4e6_4f06ffec6982\",\n            \"to_and_components\": [\n                {\n                    \"to\": [\n                        \"{{ $json.mobiles}}\"\n                    ],\n                    \"components\": {\n                        \"body_1\": {\n                            \"type\": \"text\",\n                            \"value\": \"{{ $json.names}}\"\n                        }\n                    }\n                }\n            ]\n        }\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2432,
+        464
+      ],
+      "id": "0c94924b-8efc-4bd3-bb34-75295dc10ad2",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mobileNumbers = [];\nconst names = [];\n\nfor (const item of $input.all()) {\n  const customer = item.json.customer;\n\n  if (customer?.phoneNumber) {\n    let phone = customer.phoneNumber.toString().trim();\n\n    // Add 91 only if not already present\n    if (!phone.startsWith(\"91\")) {\n      phone = \"91\" + phone;\n    }\n\n    mobileNumbers.push(phone);\n\n  }\n\n  if (customer?.name) {\n    names.push(customer.name);\n  }\n}\n\nreturn [\n  {\n    json: {\n      mobiles: mobileNumbers,\n      names: names\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        464
+      ],
+      "id": "fbd44c4f-4a16-4bc6-ad80-57da592c7a92",
+      "name": "Code in JavaScript4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const mobileNumbers = [];\nconst names = [];\n\nfor (const item of $input.all()) {\n  const customer = item.json.customer;\n\n  if (customer?.phoneNumber) {\n    let phone = customer.phoneNumber.toString().trim();\n\n    // Add 91 only if not already present\n    if (!phone.startsWith(\"91\")) {\n      phone = \"91\" + phone;\n    }\n\n    mobileNumbers.push(phone);\n\n  }\n\n  if (customer?.name) {\n    names.push(customer.name);\n  }\n}\n\nreturn [\n  {\n    json: {\n      mobiles: mobileNumbers,\n      names: names\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        1088
+      ],
+      "id": "a83fb344-c1d3-4632-aa4a-996bc2d95568",
+      "name": "Code in JavaScript5"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.msg91.com/api/v5/whatsapp/whatsapp-outbound-message/bulk/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "authkey",
+              "value": "={{ $env.MSG91_WHATSAPP_API_KEY}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n    \"integrated_number\": \"919967272273\",\n    \"content_type\": \"template\",\n    \"payload\": {\n        \"messaging_product\": \"whatsapp\",\n        \"type\": \"template\",\n        \"template\": {\n            \"name\": \"firstform_metalead\",\n            \"language\": {\n                \"code\": \"en\",\n                \"policy\": \"deterministic\"\n            },\n            \"namespace\": \"4a01b407_1984_4bfa_b4e6_4f06ffec6982\",\n            \"to_and_components\": [\n                {\n                    \"to\": [\n                        \"{{ $json.mobiles }}\"\n                    ],\n                    \"components\": {\n                        \"body_1\": {\n                            \"type\": \"text\",\n                            \"value\": \"{{ $json.names }}\"\n                        }\n                    }\n                }\n            ]\n        }\n    }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        2448,
+        1088
+      ],
+      "id": "b59caf24-7ac2-4e1c-ae48-f4b1f8f7c38b",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// ===================== HELPERS =====================\nconst now = () => new Date().toISOString();\n\n// ===================== INPUTS =====================\nconst original = $('Code in JavaScript17').first().json;\nconst fb = $input.first().json;\n\n// ===================== MERGE =====================\nconst data = {\n  ...original,\n  campaign: fb.campaign || {},\n  adset_id: fb.id || original.adset_id,\n};\n\n// ===================== GET LATEST META PAYLOAD =====================\nconst latestEventIndex = data.raw_events?.length - 1;\nconst latestEvent = data.raw_events?.[latestEventIndex] || {};\nconst payload = latestEvent.payload || {};\n\n// ===================== BUILD UTM =====================\nconst utm = {\n  utm_source: \"meta_paid\",\n  utm_medium: payload.adset?.name || \"paid_social\",\n  utm_campaign: data.campaign?.name || \"meta_campaign\",\n  utm_term: \"\",\n  utm_content: payload.ad?.name || \"\",\n};\n\n// ===================== ATTACH UTM =====================\n// Option 1: inside raw_events (recommended)\nif (latestEventIndex >= 0) {\n  data.raw_events[latestEventIndex].utm = utm;\n}\n\n\n// ===================== OUTPUT =====================\nreturn [{ json: data }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        816
+      ],
+      "id": "e81c5304-8fe6-4218-9a25-759024cf7614",
+      "name": "Code in JavaScript7"
+    },
+    {
+      "parameters": {
+        "graphApiVersion": "v23.0",
+        "node": "={{ $json.raw_events[0].payload.adset.id }}",
+        "options": {
+          "fields": {
+            "field": [
+              {
+                "name": "campaign{id, name}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        704,
+        608
+      ],
+      "id": "0a4f8d61-75bb-4dc1-a255-492440ce838a",
+      "name": "Facebook Graph API1",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "RHBLXG9JO4oB6pOR",
+          "name": "Bullit Integration App Token"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const src = $('Code in JavaScript16').first().json;\nconst data = src.data || {};\n\nconst trim = (v) => (typeof v === 'string' ? v.trim() : '');\n\nreturn [\n  {\n    json: {\n      profile: {\n        name: trim(data.first_name) || \"\",\n        mobile: trim(data.mobile) || \"\",\n        formatted_mobile: trim(data.formatted_mobile) || \"\",\n        alternate_mobile: \"\",\n        email: trim(data.email) || \"\",\n\n        company: [\n          {\n            name: trim(data.company_name) || \"\",\n            gstin: \"\",\n            pan: \"\",\n            udyam: \"\",\n            address: {\n              street: \"\",\n              city: trim(data.city) || \"\",\n              state: \"\",\n              country: \"\",\n              pincode: \"\",\n            },\n          },\n        ],\n      },\n\n      raw_events: [\n        {\n          data_source_system: \"Meta\",\n          lead_source: \"Meta - Lead Form\",\n          received_at: new Date().toISOString(),\n          payload: src,\n        },\n      ],\n\n      metadata: {\n        created_at: new Date().toISOString(),\n        updated_at: new Date().toISOString(),\n        created_by: \"system\",\n        updated_by: \"system\",\n      },\n    },\n  },\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        304,
+        816
+      ],
+      "id": "a17f8ed2-f8e8-4700-bc8f-abdbd13a1653",
+      "name": "Code in JavaScript17"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Code in JavaScript16').item.json.form.name }}",
+                    "rightValue": "Credit Card - First Form",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1e4a603d-266b-4e3d-bbce-c6332da3e0c0"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Credit Card - First Form"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "60a07487-4bcf-4250-9e5b-963783cb263f",
+                    "leftValue": "={{ $('Code in JavaScript16').item.json.form.name }}",
+                    "rightValue": "Bullit Connect - Second Form",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Bullit Connect - Second Form"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.3,
+      "position": [
+        512,
+        800
+      ],
+      "id": "a563c246-2af8-4118-ba57-3acd96f8dc2f",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0AAWMFGPTK",
+          "mode": "list",
+          "cachedResultName": "first-form"
+        },
+        "text": "={{ $json.toJsonString() }}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.3,
+      "position": [
+        -768,
+        1120
+      ],
+      "id": "3d936b68-1b36-4ec8-9846-b5900a8d4841",
+      "name": "Send a message2",
+      "webhookId": "be78cf7b-ec93-485a-af61-860b8d7ec356",
+      "credentials": {
+        "slackApi": {
+          "id": "iNrRT0GMpgoftW9M",
+          "name": "Slack Bullit"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "page": {
+          "__rl": true,
+          "value": "784678624729008",
+          "mode": "list",
+          "cachedResultName": "Bullit",
+          "cachedResultUrl": "https://facebook.com/784678624729008"
+        },
+        "form": {
+          "__rl": true,
+          "value": "1278226480963892",
+          "mode": "list",
+          "cachedResultName": "Bullit Connect - Second Form"
+        },
+        "options": {
+          "simplifyOutput": true
+        }
+      },
+      "type": "n8n-nodes-base.facebookLeadAdsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        928
+      ],
+      "id": "b1ba4847-5393-43eb-8ec4-6dfdf6057abe",
+      "name": "Bullit Connect - Second Form",
+      "webhookId": "ca2d7fe1-bc12-4326-bee6-6148fd9089a6",
+      "credentials": {
+        "facebookLeadAdsOAuth2Api": {
+          "id": "y8u7EOFh6dhLeDt2",
+          "name": "Bullit Integration 2"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "graphApiVersion": "v23.0",
+        "node": "={{ $json.raw_events[0].payload.adset.id || \"\" }}",
+        "options": {
+          "fields": {
+            "field": [
+              {
+                "name": "campaign{id, name}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [
+        704,
+        960
+      ],
+      "id": "a005ce10-770a-47bc-a79a-3aa60d113460",
+      "name": "Facebook Graph API2",
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "vjZGC03WV09giK4p",
+          "name": "Bullit Integration2 App Token"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {
+    "Bullit Connect - Second Form": [
+      {
+        "json": {
+          "id": "875584352227306",
+          "data": {
+            "do_you_already_have_gst_/_udyam_registration?": "yes",
+            "what_support_are_you_looking_for_right_now?": "compliance_&_filings",
+            "first_name": "Shubhankar",
+            "email": "shubhankar.kaushik2003@gmail.com",
+            "phone_number": "+918756565698",
+            "city": "Ghaziabad",
+            "company_name": "COCOMELON"
+          },
+          "form": {
+            "id": "1278226480963892",
+            "name": "Bullit Connect - Second Form",
+            "locale": "en_US",
+            "status": "ACTIVE"
+          },
+          "ad": {
+            "id": "120239504999990254",
+            "name": "GG_Compliance_LeadAd_V1",
+            "status": "ACTIVE",
+            "campaign_id": "120239317186770254"
+          },
+          "adset": {
+            "id": "120239504268670254",
+            "name": "GG_BroadAudience-2_21/01/26",
+            "campaign_id": "120239317186770254",
+            "status": "ACTIVE"
+          },
+          "page": {
+            "name": "Bullit",
+            "id": "784678624729008"
+          },
+          "created_time": "2026-06-02T13:26:22+0000"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Code in JavaScript16": {
+      "main": [
+        [
+          {
+            "node": "check if customer exists2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check if customer exists2": {
+      "main": [
+        [
+          {
+            "node": "If20",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If20": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript17",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript18",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a document2": {
+      "main": [
+        [
+          {
+            "node": "If21",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If21": {
+      "main": [
+        [
+          {
+            "node": "Send a message16",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript18": {
+      "main": [
+        [
+          {
+            "node": "Create or update a document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create or update a document2": {
+      "main": [
+        [
+          {
+            "node": "If22",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If22": {
+      "main": [
+        [
+          {
+            "node": "Send a message17",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Runo Create Allocation10": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Credit Card - First Form": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Runo Create Allocation10",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Runo Create Allocation",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Runo Recreate Allocation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Runo Recreate Allocation": {
+      "main": [
+        []
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Runo Recreate Allocation1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Runo Recreate Allocation1": {
+      "main": [
+        []
+      ]
+    },
+    "Runo Create Allocation": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        []
+      ]
+    },
+    "Code in JavaScript4": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript5": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript7": {
+      "main": [
+        [
+          {
+            "node": "Create a document2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript17": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Facebook Graph API1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Facebook Graph API2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bullit Connect - Second Form": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript16",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Graph API2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript7",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "6e494eb5-a64d-4ece-9a94-f9b56de00e6e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7c76726afbd9e18a4b3f34f9ca69e38d66e8926a90312127edb24dc7376a2cb9"
+  },
+  "id": "zZedZGbB3FjuNPLU",
+  "tags": []
+}
