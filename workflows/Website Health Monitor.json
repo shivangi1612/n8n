@@ -73,16 +73,18 @@
         -16
       ],
       "id": "d70cea13-e878-4efc-8f72-9f2198314f5d",
-      "name": "If"
+      "name": "If",
+      "disabled": true
     },
     {
       "parameters": {
         "select": "user",
         "user": {
           "__rl": true,
-          "value": "U0ACVKWN5M0",
+          "value": "",
           "mode": "list",
-          "cachedResultName": "shivangi.singh"
+          "cachedResultName": "",
+          "cachedResultUrl": ""
         },
         "text": "=🚨 WEBSITE DOWN ALERT  Website: https://your-website.com  Status Code: {{$json.statusCode}}  Checked At: {{$now}}  Please investigate immediately.",
         "otherOptions": {
@@ -100,8 +102,8 @@
       "webhookId": "94fedd1c-a2fa-451b-b623-1f233c24145a",
       "credentials": {
         "slackApi": {
-          "id": "iNrRT0GMpgoftW9M",
-          "name": "Slack Bullit"
+          "id": "RYdVCqe3932WNuxJ",
+          "name": "Slack"
         }
       }
     }
@@ -149,11 +151,12 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "743a6a94-abbf-48bf-99e6-df505ad45fdb",
+  "versionId": "6a8def42-0a72-4482-8196-61189de8ca5e",
   "meta": {
     "templateCredsSetupCompleted": true,
-    "instanceId": "7c76726afbd9e18a4b3f34f9ca69e38d66e8926a90312127edb24dc7376a2cb9"
+    "instanceId": "9e971adb7201903a93d8de825cd415b6c18ea338b6a93ac98e94a49da5474aab"
   },
+  "nodeGroups": [],
   "id": "FVlLO1yQK5fZ1klM",
   "tags": []
 }
