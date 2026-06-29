@@ -335,7 +335,8 @@
       "name": "Runo Create Allocation10",
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 3000
+      "waitBetweenTries": 3000,
+      "disabled": true
     },
     {
       "parameters": {
@@ -464,7 +465,8 @@
         688
       ],
       "id": "54127eb4-be27-4250-b438-0ede36081d09",
-      "name": "Code in JavaScript"
+      "name": "Code in JavaScript",
+      "disabled": true
     },
     {
       "parameters": {
@@ -477,7 +479,8 @@
         912
       ],
       "id": "17839b78-ad06-4138-91de-9185423a1597",
-      "name": "Code in JavaScript1"
+      "name": "Code in JavaScript1",
+      "disabled": true
     },
     {
       "parameters": {
@@ -520,7 +523,8 @@
       ],
       "id": "ecd32abc-72ec-465f-98a5-582b87a5c828",
       "name": "If",
-      "alwaysOutputData": false
+      "alwaysOutputData": false,
+      "disabled": true
     },
     {
       "parameters": {
@@ -534,7 +538,8 @@
       ],
       "id": "fe1c268d-fb83-4209-bef4-5f2562e91d98",
       "name": "Code in JavaScript2",
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "disabled": true
     },
     {
       "parameters": {
@@ -561,7 +566,8 @@
         672
       ],
       "id": "d0a5bdd7-919f-4722-a147-fe4831d9b7e8",
-      "name": "Runo Recreate Allocation"
+      "name": "Runo Recreate Allocation",
+      "disabled": true
     },
     {
       "parameters": {
@@ -604,7 +610,8 @@
       ],
       "id": "c71eb352-4f42-4901-8e36-f976e00d8b98",
       "name": "If3",
-      "alwaysOutputData": false
+      "alwaysOutputData": false,
+      "disabled": true
     },
     {
       "parameters": {
@@ -618,7 +625,8 @@
       ],
       "id": "2eb8956b-5ee8-4eb3-8739-52c191e2ce96",
       "name": "Code in JavaScript3",
-      "alwaysOutputData": true
+      "alwaysOutputData": true,
+      "disabled": true
     },
     {
       "parameters": {
@@ -645,7 +653,8 @@
         896
       ],
       "id": "64a35e69-d382-4e93-aaaa-4e32ee778981",
-      "name": "Runo Recreate Allocation1"
+      "name": "Runo Recreate Allocation1",
+      "disabled": true
     },
     {
       "parameters": {
@@ -681,7 +690,8 @@
       "name": "Runo Create Allocation",
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 3000
+      "waitBetweenTries": 3000,
+      "disabled": true
     },
     {
       "parameters": {
@@ -708,7 +718,8 @@
         464
       ],
       "id": "0c94924b-8efc-4bd3-bb34-75295dc10ad2",
-      "name": "HTTP Request"
+      "name": "HTTP Request",
+      "disabled": true
     },
     {
       "parameters": {
@@ -721,7 +732,8 @@
         464
       ],
       "id": "fbd44c4f-4a16-4bc6-ad80-57da592c7a92",
-      "name": "Code in JavaScript4"
+      "name": "Code in JavaScript4",
+      "disabled": true
     },
     {
       "parameters": {
@@ -734,7 +746,8 @@
         1088
       ],
       "id": "a83fb344-c1d3-4632-aa4a-996bc2d95568",
-      "name": "Code in JavaScript5"
+      "name": "Code in JavaScript5",
+      "disabled": true
     },
     {
       "parameters": {
@@ -761,7 +774,8 @@
         1088
       ],
       "id": "b59caf24-7ac2-4e1c-ae48-f4b1f8f7c38b",
-      "name": "HTTP Request1"
+      "name": "HTTP Request1",
+      "disabled": true
     },
     {
       "parameters": {
@@ -1379,7 +1393,7 @@
     "executionOrder": "v1",
     "binaryMode": "separate"
   },
-  "versionId": "7dd8090b-5270-4d18-b5f0-b4c2dc60b79e",
+  "versionId": "0d47b44f-5f2b-45d3-bd5e-16fa0b820d7e",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "9e971adb7201903a93d8de825cd415b6c18ea338b6a93ac98e94a49da5474aab"
